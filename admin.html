@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leal Admin — Painel Administrativo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0F0E0C;
+  --bg2:#141310;
+  --bg3:#1A1815;
+  --bg4:#211F1B;
+  --border:rgba(255,255,255,.07);
+  --border2:rgba(255,255,255,.12);
+  --text:#F5F0E8;
+  --text-mid:rgba(245,240,232,.55);
+  --text-dim:rgba(245,240,232,.28);
+  --gold:#C9A96E;
+  --gold-dim:rgba(201,169,110,.25);
+  --gold-glow:rgba(201,169,110,.08);
+  --green:#34d399;
+  --red:#f87171;
+  --blue:#60a5fa;
+  --amber:#fbbf24;
+  --r:2px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  overflow:hidden;
+}
+
+/* ══ LOGIN SCREEN ══ */
+#loginScreen{
+  position:fixed;inset:0;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  z-index:1000;
+}
+#loginScreen::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 40%,rgba(201,169,110,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 60% at 80% 70%,rgba(201,169,110,.04) 0%,transparent 55%);
+}
+.login-box{
+  position:relative;z-index:2;
+  width:380px;
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  padding:44px 36px 36px;
+  box-shadow:0 40px 100px rgba(0,0,0,.6);
+}
+.login-box::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.login-brand{text-align:center;margin-bottom:32px;}
+.login-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px;font-weight:300;letter-spacing:10px;
+  text-transform:uppercase;color:var(--text);
+}
+.login-badge{
+  font-size:8px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold);margin-top:4px;font-weight:500;
+}
+.login-rule{width:32px;height:1px;background:var(--gold);margin:14px auto;opacity:.4;}
+
+.lf{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.ll{font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-mid);}
+.li{
+  background:rgba(255,255,255,.03);
+  border:none;border-bottom:1px solid var(--border2);
+  padding:12px 0;font-size:13px;
+  color:var(--text);outline:none;
+  font-family:'DM Sans',sans-serif;
+  transition:border-color .2s;
+  width:100%;
+}
+.li::placeholder{color:var(--text-dim);}
+.li:focus{border-bottom-color:var(--gold);}
+.li.err{border-bottom-color:var(--red)!important;}
+
+.btn-login-admin{
+  width:100%;height:48px;margin-top:8px;
+  background:var(--gold);border:none;
+  font-family:'DM Sans',sans-serif;font-size:10px;
+  font-weight:700;letter-spacing:3.5px;text-transform:uppercase;
+  color:#0F0E0C;cursor:pointer;
+  transition:opacity .2s,transform .15s;
+  position:relative;overflow:hidden;
+}
+.btn-login-admin:hover{opacity:.9;transform:translateY(-1px);}
+.btn-login-admin.loading{pointer-events:none;opacity:.6;}
+.login-err{font-size:11px;color:var(--red);text-align:center;margin-top:10px;min-height:18px;letter-spacing:.5px;}
+
+/* ══ LAYOUT ADMIN ══ */
+#adminApp{display:none;flex:1;overflow:hidden;}
+#adminApp.show{display:flex;}
+
+/* Sidebar */
+.sidebar{
+  width:220px;flex-shrink:0;
+  background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.sb-brand{
+  padding:24px 20px 20px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.sb-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;font-weight:300;letter-spacing:5px;
+  text-transform:uppercase;color:var(--text);font-style:italic;
+}
+.sb-sub{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-top:3px;}
+
+.sb-nav{padding:12px 0;flex:1;overflow-y:auto;}
+.sb-section{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);padding:14px 20px 6px;font-weight:600;}
+.sb-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 20px;cursor:pointer;
+  font-size:12px;font-weight:500;letter-spacing:.5px;
+  color:var(--text-mid);
+  transition:color .2s,background .2s;
+  border-left:2px solid transparent;
+  position:relative;
+}
+.sb-item:hover{color:var(--text);background:rgba(255,255,255,.03);}
+.sb-item.active{color:var(--gold);border-left-color:var(--gold);background:var(--gold-glow);}
+.sb-item svg{width:14px;height:14px;opacity:.6;flex-shrink:0;stroke:currentColor;fill:none;}
+.sb-item.active svg{opacity:1;}
+
+.sb-footer{
+  padding:16px 20px;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.sb-avatar{width:30px;height:30px;background:var(--gold-dim);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gold);}
+.sb-user{font-size:11px;font-weight:500;color:var(--text-mid);flex:1;}
+.btn-sair{
+  background:none;border:none;cursor:pointer;
+  font-size:10px;color:var(--red);opacity:.6;
+  font-family:inherit;letter-spacing:1px;
+  transition:opacity .2s;
+}
+.btn-sair:hover{opacity:1;}
+
+/* Main area */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{
+  padding:16px 24px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;background:var(--bg2);
+}
+.topbar-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;font-weight:300;letter-spacing:2px;color:var(--text);
+}
+.topbar-meta{font-size:10px;color:var(--text-dim);letter-spacing:1.5px;margin-top:2px;}
+
+.content{flex:1;overflow-y:auto;padding:24px;}
+.content::-webkit-scrollbar{width:4px;}
+.content::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
+
+/* ══ PAGES ══ */
+.page{display:none;}
+.page.active{display:block;}
+
+/* ── DASHBOARD ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+@media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.stat-card{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  padding:18px 20px;
+  position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:.3;
+}
+.stat-icon{font-size:20px;margin-bottom:8px;opacity:.7;}
+.stat-val{
+  font-family:'Cormorant Garamond',serif;
+  font-size:30px;font-weight:300;color:var(--text);
+}
+.stat-label{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-dim);margin-top:4px;}
+.stat-trend{font-size:10px;color:var(--green);margin-top:6px;}
+
+/* Tabela genérica */
+.table-wrap{overflow-x:auto;margin-top:16px;}
+table{width:100%;border-collapse:collapse;}
+thead th{
+  font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--text-dim);padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  text-align:left;background:var(--bg2);white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s;}
+tbody tr:hover{background:rgba(255,255,255,.025);}
+tbody td{padding:11px 14px;font-size:12px;color:var(--text-mid);vertical-align:middle;}
+.td-nome{color:var(--text)!important;font-weight:500;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;}
+.badge-ok{color:var(--green);background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);}
+.badge-pend{color:var(--amber);background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);}
+.badge-inativo{color:var(--text-dim);background:rgba(255,255,255,.04);border:1px solid var(--border);}
+
+/* ── TOOLBAR ── */
+.tb{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.tb-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;font-weight:300;letter-spacing:2px;color:var(--text);flex:1;
+}
+.search-inp{
+  background:var(--bg3);
+  border:1px solid var(--border2);
+  padding:8px 14px;font-size:12px;
+  color:var(--text);outline:none;
+  font-family:'DM Sans',sans-serif;
+  width:220px;
+  transition:border-color .2s;
+}
+.search-inp::placeholder{color:var(--text-dim);}
+.search-inp:focus{border-color:var(--gold);}
+
+.btn-gold{
+  background:var(--gold);border:none;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:9px;
+  font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:#0F0E0C;padding:9px 18px;
+  transition:opacity .2s,transform .15s;
+}
+.btn-gold:hover{opacity:.88;transform:translateY(-1px);}
+
+.btn-outline{
+  background:transparent;
+  border:1px solid var(--border2);
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-mid);padding:8px 15px;
+  transition:all .2s;
+}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-danger{
+  background:transparent;border:1px solid rgba(248,113,113,.2);cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:9px;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--red);
+  opacity:.6;padding:5px 10px;transition:all .2s;
+}
+.btn-danger:hover{opacity:1;background:rgba(248,113,113,.08);border-color:var(--red);}
+.btn-edit{
+  background:transparent;border:1px solid var(--border);cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:9px;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);
+  padding:5px 10px;transition:all .2s;
+}
+.btn-edit:hover{border-color:var(--gold);color:var(--gold);}
+
+/* ── MODAL PRODUTO ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);
+  z-index:500;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-box{
+  background:var(--bg2);border:1px solid var(--border2);
+  width:480px;max-height:90vh;overflow-y:auto;padding:28px 28px 24px;
+  transform:scale(.92) translateY(16px);
+  transition:transform .3s cubic-bezier(.34,1.4,.64,1),opacity .25s;
+  opacity:0;
+  position:relative;
+}
+.modal-box::-webkit-scrollbar{width:3px;}
+.modal-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);}
+.modal-overlay.open .modal-box{transform:scale(1) translateY(0);opacity:1;}
+.modal-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;font-weight:300;letter-spacing:2px;
+  color:var(--text);margin-bottom:20px;
+}
+.mf{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.ml{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-mid);}
+.mi{
+  background:rgba(255,255,255,.03);border:none;
+  border-bottom:1px solid var(--border2);
+  padding:10px 0;font-size:13px;color:var(--text);
+  outline:none;font-family:'DM Sans',sans-serif;
+  transition:border-color .2s;width:100%;
+}
+.mi::placeholder{color:var(--text-dim);}
+.mi:focus{border-bottom-color:var(--gold);}
+.mi.err{border-bottom-color:var(--red)!important;}
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+textarea.mi{resize:vertical;min-height:70px;padding-top:8px;}
+select.mi{background:var(--bg3);cursor:pointer;}
+select.mi option{background:var(--bg3);}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:6px;padding-top:14px;border-top:1px solid var(--border);}
+.modal-close-btn{
+  position:absolute;top:14px;right:14px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border2);
+  width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text-mid);font-size:11px;transition:all .2s;
+}
+.modal-close-btn:hover{background:var(--red);color:#fff;border-color:var(--red);}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:60px 20px;}
+.empty-icon{font-size:36px;opacity:.2;margin-bottom:12px;}
+.empty-txt{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-dim);}
+
+/* ── TOAST ── */
+#adminToast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:var(--bg3);border:1px solid var(--border2);
+  padding:10px 20px;font-size:11px;font-weight:500;
+  letter-spacing:1px;color:var(--text);
+  opacity:0;transition:opacity .3s,transform .3s;
+  z-index:9999;pointer-events:none;
+  text-transform:uppercase;
+}
+#adminToast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── LOADING ── */
+.spin{
+  display:inline-block;width:14px;height:14px;
+  border:1.5px solid rgba(255,255,255,.15);
+  border-top-color:var(--gold);
+  border-radius:50%;
+  animation:sp .7s linear infinite;
+}
+@keyframes sp{to{transform:rotate(360deg)}}
+.loading-row td{text-align:center;padding:30px;}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-brand">
+      <div class="login-logo">Leal</div>
+      <div class="login-badge">Painel Administrativo</div>
+      <div class="login-rule"></div>
+    </div>
+    <div class="lf">
+      <label class="ll">Usuário</label>
+      <input class="li" id="aUser" type="text" placeholder="admin" autocomplete="off">
+    </div>
+    <div class="lf">
+      <label class="ll">Senha</label>
+      <input class="li" id="aPass" type="password" placeholder="••••••••">
+    </div>
+    <button class="btn-login-admin" id="btnAdminLogin">Acessar Painel</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="adminApp">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">Leal</div>
+      <div class="sb-sub">Admin Panel</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Visão Geral</div>
+      <div class="sb-item active" data-page="dashboard">
+        <svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </div>
+      <div class="sb-section">Catálogo</div>
+      <div class="sb-item" data-page="produtos">
+        <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+        Produtos
+      </div>
+      <div class="sb-section">Relatórios</div>
+      <div class="sb-item" data-page="vendas">
+        <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12h6M9 16h4"/></svg>
+        Histórico de Vendas
+      </div>
+      <div class="sb-item" data-page="clientes">
+        <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Clientes Cadastrados
+      </div>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-avatar">A</div>
+      <div class="sb-user">Admin</div>
+      <button class="btn-sair" id="btnAdminLogout">Sair</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="pageTitle">Dashboard</div>
+        <div class="topbar-meta" id="pageMeta">Visão geral da loja</div>
+      </div>
+      <div style="font-size:10px;color:var(--text-dim);letter-spacing:1px;" id="currentTime"></div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="page active" id="pageDashboard">
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-val" id="statClientes">—</div><div class="stat-label">Clientes Cadastrados</div></div>
+          <div class="stat-card"><div class="stat-icon">📦</div><div class="stat-val" id="statProdutos">—</div><div class="stat-label">Produtos Ativos</div></div>
+          <div class="stat-card"><div class="stat-icon">🛒</div><div class="stat-val" id="statPedidos">—</div><div class="stat-label">Total de Pedidos</div></div>
+          <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-val" id="statReceita">—</div><div class="stat-label">Receita Total</div></div>
+        </div>
+
+        <div class="tb"><div class="tb-title">Últimas Vendas</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Pedido</th><th>Cliente</th><th>Itens</th><th>Total</th><th>Método</th><th>Status</th><th>Data</th></tr></thead>
+            <tbody id="dashVendasTbody"><tr class="loading-row"><td colspan="7"><span class="spin"></span></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── PRODUTOS ── -->
+      <div class="page" id="pageProdutos">
+        <div class="tb">
+          <div class="tb-title">Catálogo de Produtos</div>
+          <input class="search-inp" id="searchProd" placeholder="Buscar produto...">
+          <button class="btn-gold" id="btnNovoProd">+ Novo Produto</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Emoji</th><th>Nome</th><th>Preço</th><th>Categoria</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="prodTbody"><tr class="loading-row"><td colspan="6"><span class="spin"></span></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── VENDAS ── -->
+      <div class="page" id="pageVendas">
+        <div class="tb">
+          <div class="tb-title">Histórico de Vendas</div>
+          <input class="search-inp" id="searchVenda" placeholder="Buscar por cliente ou pedido...">
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Pedido #</th><th>Cliente</th><th>Total</th><th>Método</th><th>Endereço</th><th>Status</th><th>Data</th></tr></thead>
+            <tbody id="vendasTbody"><tr class="loading-row"><td colspan="7"><span class="spin"></span></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── CLIENTES ── -->
+      <div class="page" id="pageClientes">
+        <div class="tb">
+          <div class="tb-title">Clientes Cadastrados</div>
+          <input class="search-inp" id="searchCliente" placeholder="Buscar por nome ou telefone...">
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Nome</th><th>CEP</th><th>Telefone</th><th>Cadastro em</th></tr></thead>
+            <tbody id="clientesTbody"><tr class="loading-row"><td colspan="5"><span class="spin"></span></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div><!-- /adminApp -->
+
+<!-- ══ MODAL PRODUTO ══ -->
+<div class="modal-overlay" id="modalProd">
+  <div class="modal-box">
+    <button class="modal-close-btn" id="modalProdClose">✕</button>
+    <div class="modal-title" id="modalProdTitle">Novo Produto</div>
+    <input type="hidden" id="mpId">
+    <div class="mrow">
+      <div class="mf"><label class="ml">Emoji</label><input class="mi" id="mpEmoji" placeholder="👟" maxlength="4"></div>
+      <div class="mf"><label class="ml">Categoria</label>
+        <select class="mi" id="mpTag">
+          <option value="Esportes">Esportes</option>
+          <option value="Fitness">Fitness</option>
+          <option value="Eletrônicos">Eletrônicos</option>
+          <option value="Games">Games</option>
+          <option value="Moda">Moda</option>
+          <option value="Beleza">Beleza</option>
+          <option value="Casa">Casa</option>
+          <option value="Cozinha">Cozinha</option>
+          <option value="Aventura">Aventura</option>
+          <option value="Arte">Arte</option>
+          <option value="Escritório">Escritório</option>
+          <option value="Pets">Pets</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf"><label class="ml">Nome do Produto</label><input class="mi" id="mpNome" placeholder="Ex: Tênis Pro Run"></div>
+    <div class="mrow">
+      <div class="mf"><label class="ml">Preço (display)</label><input class="mi" id="mpPrecoDisplay" placeholder="R$ 349,90"></div>
+      <div class="mf"><label class="ml">Preço (número)</label><input class="mi" id="mpPrecoVal" placeholder="349.90" type="number" step="0.01"></div>
+    </div>
+    <div class="mf"><label class="ml">Descrição</label><textarea class="mi" id="mpDesc" placeholder="Descrição do produto..."></textarea></div>
+    <div class="mf">
+      <label class="ml">Status</label>
+      <select class="mi" id="mpAtivo"><option value="true">Ativo</option><option value="false">Inativo</option></select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" id="btnCancelarProd">Cancelar</button>
+      <button class="btn-gold" id="btnSalvarProd">Salvar Produto</button>
+    </div>
+  </div>
+</div>
+
+<div id="adminToast"></div>
+
+<script>
+/* ══════════════════════════════════════════════
+   LEAL ADMIN — script
+══════════════════════════════════════════════ */
+const $ = id => document.getElementById(id);
+const API = window.location.origin;
+let adminToken = sessionStorage.getItem('leal_admin_token') || null;
+let allProdutos = [], allVendas = [], allClientes = [];
+
+/* ── UTILS ── */
+function toast(msg){ const t=$('adminToast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800); }
+function fmt(val){ return 'R$ '+parseFloat(val).toFixed(2).replace('.',','); }
+function fmtDate(d){ return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+
+async function apiFetch(endpoint, options={}){
+  const headers = { 'Content-Type':'application/json' };
+  if(adminToken) headers['Authorization'] = 'Bearer '+adminToken;
+  const res = await fetch(API+endpoint, { ...options, headers:{...headers,...(options.headers||{})} });
+  const data = await res.json();
+  if(!res.ok) throw new Error(data.error||'Erro');
+  return data;
+}
+
+/* ── RELÓGIO ── */
+function updateClock(){
+  const now=new Date();
+  $('currentTime').textContent=now.toLocaleString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).toUpperCase();
+}
+updateClock(); setInterval(updateClock,60000);
+
+/* ── LOGIN ── */
+$('btnAdminLogin').addEventListener('click', async ()=>{
+  const usuario=$('aUser').value.trim(), senha=$('aPass').value;
+  $('loginErr').textContent='';
+  if(!usuario||!senha){ $('loginErr').textContent='Preencha todos os campos.'; return; }
+  $('btnAdminLogin').classList.add('loading');
+  try {
+    const data = await apiFetch('/api/admin/login',{method:'POST',body:JSON.stringify({usuario,senha})});
+    adminToken = data.token;
+    sessionStorage.setItem('leal_admin_token', adminToken);
+    $('loginScreen').style.display='none';
+    $('adminApp').classList.add('show');
+    loadDashboard();
+  } catch(err){
+    $('loginErr').textContent = err.message;
+  } finally {
+    $('btnAdminLogin').classList.remove('loading');
+  }
+});
+$('aPass').addEventListener('keydown',e=>{ if(e.key==='Enter') $('btnAdminLogin').click(); });
+
+/* Auto-login se sessão salva */
+if(adminToken){
+  $('loginScreen').style.display='none';
+  $('adminApp').classList.add('show');
+  loadDashboard();
+}
+
+/* ── LOGOUT ── */
+$('btnAdminLogout').addEventListener('click',()=>{
+  adminToken=null; sessionStorage.removeItem('leal_admin_token');
+  $('adminApp').classList.remove('show'); $('loginScreen').style.display='flex';
+  $('aUser').value=''; $('aPass').value='';
+});
+
+/* ── NAVEGAÇÃO ── */
+const pageTitles = { dashboard:['Dashboard','Visão geral da loja'], produtos:['Produtos','Gerenciar catálogo'], vendas:['Histórico de Vendas','Todos os pedidos realizados'], clientes:['Clientes Cadastrados','Base de clientes da loja'] };
+document.querySelectorAll('.sb-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    const pg = item.dataset.page;
+    document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+    item.classList.add('active');
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    $('page'+pg.charAt(0).toUpperCase()+pg.slice(1)).classList.add('active');
+    const [title,meta] = pageTitles[pg];
+    $('pageTitle').textContent=title; $('pageMeta').textContent=meta;
+    if(pg==='dashboard') loadDashboard();
+    if(pg==='produtos') loadProdutos();
+    if(pg==='vendas') loadVendas();
+    if(pg==='clientes') loadClientes();
+  });
+});
+
+/* ══════════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════════ */
+async function loadDashboard(){
+  try {
+    const stats = await apiFetch('/api/admin/stats');
+    $('statClientes').textContent = stats.total_clientes;
+    $('statProdutos').textContent = stats.total_produtos;
+    $('statPedidos').textContent = stats.total_pedidos;
+    $('statReceita').textContent = fmt(stats.receita_total);
+    loadDashVendas();
+  } catch(e){ toast('❌ '+e.message); }
+}
+
+async function loadDashVendas(){
+  const tbody = $('dashVendasTbody');
+  try {
+    const vendas = await apiFetch('/api/admin/vendas');
+    const recentes = vendas.slice(0,10);
+    if(!recentes.length){ tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-txt">Nenhuma venda ainda</div></div></td></tr>'; return; }
+    tbody.innerHTML = recentes.map(v=>{
+      const itens = typeof v.itens==='string'?JSON.parse(v.itens):v.itens||[];
+      const resumo = itens.slice(0,2).map(i=>(i.emoji||'📦')+' '+(i.nome||i.name||'')).join(', ')+(itens.length>2?` +${itens.length-2}`:'');
+      const badge = v.status==='confirmado'?'badge-ok':'badge-pend';
+      const label = v.status==='confirmado'?'✓ Confirmado':'⏳ Pendente';
+      return `<tr><td><span style="font-weight:600;color:var(--gold)">#${v.id}</span></td><td class="td-nome">${v.cliente_nome||'—'}</td><td style="font-size:11px">${resumo}</td><td>${fmt(v.total)}</td><td>${v.metodo_pagamento||'—'}</td><td><span class="badge ${badge}">${label}</span></td><td style="color:var(--text-dim)">${fmtDate(v.criado_em)}</td></tr>`;
+    }).join('');
+  } catch(e){ tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text-dim);padding:20px">Erro ao carregar</td></tr>'; }
+}
+
+/* ══════════════════════════════════════════════
+   PRODUTOS
+══════════════════════════════════════════════ */
+async function loadProdutos(){
+  const tbody = $('prodTbody');
+  try {
+    allProdutos = await apiFetch('/api/admin/produtos');
+    renderProdutos(allProdutos);
+  } catch(e){ tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-dim)">${e.message}</td></tr>`; }
+}
+
+function renderProdutos(list){
+  const tbody = $('prodTbody');
+  if(!list.length){ tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📦</div><div class="empty-txt">Nenhum produto cadastrado</div></div></td></tr>'; return; }
+  tbody.innerHTML = list.map(p=>`
+    <tr>
+      <td style="font-size:22px">${p.emoji}</td>
+      <td class="td-nome">${p.nome}</td>
+      <td style="color:var(--gold)">${p.preco_display}</td>
+      <td><span style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim)">${p.tag}</span></td>
+      <td><span class="badge ${p.ativo?'badge-ok':'badge-inativo'}">${p.ativo?'Ativo':'Inativo'}</span></td>
+      <td style="display:flex;gap:6px;padding:11px 14px">
+        <button class="btn-edit" onclick="editProd(${p.id})">Editar</button>
+        <button class="btn-danger" onclick="deleteProd(${p.id},'${p.nome.replace(/'/g,"\\'")}')">Remover</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+$('searchProd').addEventListener('input',()=>{
+  const q=$('searchProd').value.toLowerCase();
+  renderProdutos(allProdutos.filter(p=>p.nome.toLowerCase().includes(q)||p.tag.toLowerCase().includes(q)));
+});
+
+/* Modal produto */
+function openModalProd(prod=null){
+  $('mpId').value = prod?.id||'';
+  $('mpEmoji').value = prod?.emoji||'';
+  $('mpNome').value = prod?.nome||'';
+  $('mpPrecoDisplay').value = prod?.preco_display||'';
+  $('mpPrecoVal').value = prod?.preco_val||'';
+  $('mpDesc').value = prod?.descricao||'';
+  $('mpTag').value = prod?.tag||'Esportes';
+  $('mpAtivo').value = String(prod?.ativo??true);
+  $('modalProdTitle').textContent = prod?'Editar Produto':'Novo Produto';
+  ['mpEmoji','mpNome','mpPrecoDisplay','mpPrecoVal','mpDesc'].forEach(id=>$(id).classList.remove('err'));
+  $('modalProd').classList.add('open');
+}
+$('btnNovoProd').addEventListener('click',()=>openModalProd());
+$('modalProdClose').addEventListener('click',()=>$('modalProd').classList.remove('open'));
+$('btnCancelarProd').addEventListener('click',()=>$('modalProd').classList.remove('open'));
+
+window.editProd = (id)=>{ const p=allProdutos.find(x=>x.id===id); if(p) openModalProd(p); };
+window.deleteProd = async (id, nome)=>{
+  if(!confirm(`Remover "${nome}"?`)) return;
+  try { await apiFetch('/api/admin/produtos/'+id,{method:'DELETE'}); toast('✅ Produto removido'); loadProdutos(); }
+  catch(e){ toast('❌ '+e.message); }
+};
+
+$('btnSalvarProd').addEventListener('click', async ()=>{
+  const id=$('mpId').value;
+  const emoji=$('mpEmoji').value.trim(),nome=$('mpNome').value.trim();
+  const pd=$('mpPrecoDisplay').value.trim(),pv=parseFloat($('mpPrecoVal').value);
+  const tag=$('mpTag').value,desc=$('mpDesc').value.trim();
+  const ativo=$('mpAtivo').value==='true';
+  let ok=true;
+  ['mpEmoji','mpNome','mpPrecoDisplay','mpPrecoVal'].forEach(i=>$(i).classList.remove('err'));
+  if(!emoji){$('mpEmoji').classList.add('err');ok=false;}
+  if(!nome){$('mpNome').classList.add('err');ok=false;}
+  if(!pd){$('mpPrecoDisplay').classList.add('err');ok=false;}
+  if(!pv||isNaN(pv)){$('mpPrecoVal').classList.add('err');ok=false;}
+  if(!ok) return;
+  try {
+    if(id){ await apiFetch('/api/admin/produtos/'+id,{method:'PUT',body:JSON.stringify({emoji,nome,preco_display:pd,preco_val:pv,tag,descricao:desc,ativo})}); toast('✅ Produto atualizado'); }
+    else { await apiFetch('/api/admin/produtos',{method:'POST',body:JSON.stringify({emoji,nome,preco_display:pd,preco_val:pv,tag,descricao:desc})}); toast('✅ Produto criado'); }
+    $('modalProd').classList.remove('open');
+    loadProdutos();
+  } catch(e){ toast('❌ '+e.message); }
+});
+
+/* ══════════════════════════════════════════════
+   VENDAS
+══════════════════════════════════════════════ */
+async function loadVendas(){
+  const tbody=$('vendasTbody');
+  try {
+    allVendas = await apiFetch('/api/admin/vendas');
+    renderVendas(allVendas);
+  } catch(e){ tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-dim)">${e.message}</td></tr>`; }
+}
+
+function renderVendas(list){
+  const tbody=$('vendasTbody');
+  if(!list.length){ tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-txt">Nenhuma venda registrada</div></div></td></tr>'; return; }
+  tbody.innerHTML = list.map(v=>{
+    const end = typeof v.endereco==='string'?JSON.parse(v.endereco):v.endereco||{};
+    const endStr = end.rua?`${end.rua}, ${end.numero} — ${end.cidade}/${end.estado}`:'—';
+    const badge = v.status==='confirmado'?'badge-ok':'badge-pend';
+    const label = v.status==='confirmado'?'✓ Confirmado':'⏳ Pendente';
+    return `<tr>
+      <td><span style="font-weight:600;color:var(--gold)">#${v.id}</span></td>
+      <td class="td-nome">${v.cliente_nome||'—'}</td>
+      <td>${fmt(v.total)}</td>
+      <td>${v.metodo_pagamento||'—'}</td>
+      <td style="font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${endStr}</td>
+      <td><span class="badge ${badge}">${label}</span></td>
+      <td style="color:var(--text-dim)">${fmtDate(v.criado_em)}</td>
+    </tr>`;
+  }).join('');
+}
+
+$('searchVenda').addEventListener('input',()=>{
+  const q=$('searchVenda').value.toLowerCase();
+  renderVendas(allVendas.filter(v=>(v.cliente_nome||'').toLowerCase().includes(q)||String(v.id).includes(q)));
+});
+
+/* ══════════════════════════════════════════════
+   CLIENTES
+══════════════════════════════════════════════ */
+async function loadClientes(){
+  const tbody=$('clientesTbody');
+  try {
+    allClientes = await apiFetch('/api/admin/clientes');
+    renderClientes(allClientes);
+  } catch(e){ tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text-dim)">${e.message}</td></tr>`; }
+}
+
+function renderClientes(list){
+  const tbody=$('clientesTbody');
+  if(!list.length){ tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-txt">Nenhum cliente cadastrado</div></div></td></tr>'; return; }
+  tbody.innerHTML = list.map(c=>`
+    <tr>
+      <td style="color:var(--text-dim)">#${c.id}</td>
+      <td class="td-nome">${c.nome}</td>
+      <td>${c.cep||'—'}</td>
+      <td>${c.telefone||'—'}</td>
+      <td style="color:var(--text-dim)">${fmtDate(c.criado_em)}</td>
+    </tr>
+  `).join('');
+}
+
+$('searchCliente').addEventListener('input',()=>{
+  const q=$('searchCliente').value.toLowerCase();
+  renderClientes(allClientes.filter(c=>c.nome.toLowerCase().includes(q)||(c.telefone||'').includes(q)));
+});
+</script>
+</body>
+</html>

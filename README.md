@@ -1,3 +1,13 @@
-Para acessar o sitema https://leal-fashion.onrender.com o website com criacao de conta e login e produtos para a compra .
+Site para acessar o sistema https://leal-fashion.onrender.com/ , com sistema de cadastro e login futuro .
 
-Para acessar a area administrativa do site https://leal-fashion.onrender.com/admin , com clientes cadastrados , numero de produtos , vendas e receira . login ( admin ) , senha leal@admin2025
+acesso aos produtos podendo realizar a compra com pix , cartao de credito ou boleto.
+
+editar perfil com foto e descricoes 
+
+Site para cadastro de produtos https://leal-fashion.onrender.com/admin , Login ( admin ) , senha ( leal@admin2025 ) 
+
+Motra a quanditdade de clientes cadastrados , quantidade de vendas e de produtos  podendo editar e remover 
+
+Mostra produtos ativos , receita total de vendas 
+
+

@@ -16,8 +16,7 @@ app.get('/.well-known/appspecific/com.chrome.devtools.json', (_req, res) => res.
 
 /* ═══════════════════════════════════
    NEON POSTGRESQL — conexão
-   Em produção (Render) vem de variável de ambiente.
-   Em desenvolvimento local vem do .env
+   
 ═══════════════════════════════════ */
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,

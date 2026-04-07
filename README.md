@@ -6,7 +6,7 @@ editar perfil com foto e descricoes
 
 Site para cadastro de produtos https://leal-fashion.onrender.com/admin , Login ( admin ) , senha ( leal@admin2025 ) 
 
-Motra a quanditdade de clientes cadastrados , quantidade de vendas e de produtos  podendo editar e remover 
+Mostra a quanditdade de clientes cadastrados , quantidade de vendas e de produtos  podendo editar e remover 
 
 Mostra produtos ativos , receita total de vendas 
 

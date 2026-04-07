@@ -1,4 +1,8 @@
-( Site do cliente ) para acessar o sistema https://leal-fashion.onrender.com/ , com sistema de cadastro de contas.
+Site de compras frontend + backend integrados 
+
+
+( Site do cliente ) para acessar o sistema 
+https://leal-fashion.onrender.com/ , com sistema de cadastro de contas.
 
 acesso aos produtos podendo realizar a compra com pix , cartao de credito ou boleto.
 

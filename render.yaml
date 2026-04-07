@@ -8,7 +8,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        sync: false        # você cola o valor no painel do Render
+        sync: false        
       - key: JWT_SECRET
         sync: false
       - key: ADMIN_USER
